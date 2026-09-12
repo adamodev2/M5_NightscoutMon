@@ -2,6 +2,11 @@
 
 ## Revisions
 
+### 12 September 2026 (LibreLinkUp direct client session fix)
+
+* Fixed direct LibreLinkUp polling when the web configuration uses the recommended `AUTO` region. The regional host returned during login is now retained for the lifetime of the authentication token, so later polls no longer fall back to the universal login host with a region-specific token.
+* Changing the LibreLinkUp email, password, region, or active data source clears both the authentication token and the cached regional host. The saved setting remains `AUTO`, allowing region detection to run again after a restart or configuration change.
+
 
 ### 15 August 2026 (Waveshare ESP32-Touch-LCD-3.5 port)
 

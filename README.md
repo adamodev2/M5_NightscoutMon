@@ -57,8 +57,8 @@ dexcom_server = 0                   ; Dexcom server region: 0 = US, 1 = outside 
 libre_user = your_libre_email       ; LibreLinkUp account email, only used when data_source = 2
 libre_pass = your_libre_password    ; LibreLinkUp password, stored in plain text like token/wifi passwords above
                                     ; use a LibreLinkUp FOLLOWER account, not the LibreView account itself
-libre_server = 5                    ; LibreLinkUp region: 0=AE 1=AP 2=AU 3=CA 4=DE 5=EU(default) 6=EU2 7=FR 8=JP 9=US 10=LA 11=RU
-                                    ; auto-corrects itself on first login if it doesn't match your account
+libre_server = 12                   ; LibreLinkUp region: 0=AE 1=AP 2=AU 3=CA 4=DE 5=EU 6=EU2 7=FR 8=JP 9=US 10=LA 11=RU
+                                    ; 12=AUTO (default/recommended): detects and reuses the account's regional host
 bootpic = /M5_NightscoutMon.jpg     ; boot picture
 name = YourName                     ; display name
 device_name = M5NS                  ; device name for mDNS, that can be used to access the device from local

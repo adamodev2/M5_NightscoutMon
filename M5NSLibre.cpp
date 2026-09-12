@@ -40,6 +40,10 @@ static String libreToken = "";
 static time_t libreTokenExpires = 0;
 static char libreAccountIdHash[65] = "";
 static char librePatientId[64] = "";
+// Runtime host selected for the current token. This is deliberately separate from
+// cfg.libre_server: AUTO remains saved in the configuration, while every poll in the
+// authenticated session keeps using the regional host returned by LibreLinkUp.
+static int libreActiveServerIdx = -1;
 // Set once LibreLinkUp reports invalid credentials, to stop hammering the account with
 // repeated failed logins. Cleared by libreResetSession().
 static bool libreCredentialError = false;
@@ -49,6 +53,7 @@ void libreResetSession() {
   libreTokenExpires = 0;
   libreAccountIdHash[0] = 0;
   librePatientId[0] = 0;
+  libreActiveServerIdx = -1;
   libreCredentialError = false;
 }
 
@@ -251,9 +256,13 @@ int readLibre(tConfig *cfg, struct NSinfo *ns) {
     return 1202;
   }
 
-  int serverIdx = cfg->libre_server;
-  if (serverIdx < 0 || serverIdx > LIBRE_AUTO)
-    serverIdx = LIBRE_AUTO; // default: log in via the universal entry point and auto-detect the region
+  int configuredServerIdx = cfg->libre_server;
+  if (configuredServerIdx < 0 || configuredServerIdx > LIBRE_AUTO)
+    configuredServerIdx = LIBRE_AUTO;
+  // A token is valid only on its regional API host. Without this session cache, AUTO
+  // correctly followed the redirect for the first reading but the next poll went back
+  // to api.libreview.io with that regional token.
+  int serverIdx = libreActiveServerIdx >= 0 ? libreActiveServerIdx : configuredServerIdx;
 
   WiFiClientSecure client;
   client.setInsecure();
@@ -275,6 +284,7 @@ int readLibre(tConfig *cfg, struct NSinfo *ns) {
         if (err != 0)
           return err;
       }
+      libreActiveServerIdx = serverIdx;
       librePatientId[0] = 0; // token changed, re-resolve the followed patient
     }
 
